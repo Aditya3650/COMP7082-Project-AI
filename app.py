@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from sentence_transformers import CrossEncoder
 import torch
@@ -6,22 +6,21 @@ from groq import Groq
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-# Initialize the sentence similarity model
 similarity_model = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2", default_activation_function=torch.nn.Sigmoid())
-
-# Get the Groq API key from environment variables
 groq_api_key = os.getenv("GROQ_API_KEY")
-
-# Initialize Groq client with the API key
 client = Groq(api_key=groq_api_key)
 
-# Define your routes (for example, the /ai_remarks route)
+# Root route to serve the HTML form
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+# API route to get AI remarks
 @app.route('/ai_remarks', methods=['POST'])
 def get_ai_remarks():
     data = request.get_json()
@@ -32,10 +31,8 @@ def get_ai_remarks():
         return jsonify({'error': 'Both sentences are required'}), 400
 
     try:
-        # Calculate similarity score
         similarity_score = similarity_model.predict([(sentence1, sentence2)])[0] * 100
 
-        # Generate AI remarks
         chat_completion = client.chat.completions.create(
             messages=[
                 {"role": "system", "content": "You are an AI assistant providing feedback."},
