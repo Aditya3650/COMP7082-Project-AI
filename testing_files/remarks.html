@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Remarks on Sentences</title>
+</head>
+<body>
+    <h1>Compare Two Sentences with AI Remarks</h1>
+    
+    <form id="aiRemarksForm">
+        <label for="sentence1">Sentence 1:</label>
+        <input type="text" id="sentence1" name="sentence1" required><br><br>
+
+        <label for="sentence2">Sentence 2:</label>
+        <input type="text" id="sentence2" name="sentence2" required><br><br>
+
+        <button type="button" onclick="getAIRemarks()">Get AI Remarks</button>
+    </form>
+    
+    <p id="loadingMessage" style="display:none;">Loading AI response...</p>
+    <p id="aiRemarksResult"></p>
+
+    <script>
+        async function getAIRemarks() {
+            const sentence1 = document.getElementById('sentence1').value;
+            const sentence2 = document.getElementById('sentence2').value;
+            const loadingMessage = document.getElementById('loadingMessage');
+            const aiRemarksResult = document.getElementById('aiRemarksResult');
+
+            // Show loading message
+            loadingMessage.style.display = 'block';
+            aiRemarksResult.innerText = '';
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/ai_remarks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ sentence1, sentence2 }),
+                });
+                
+                const data = await response.json();
+                aiRemarksResult.innerText = `AI Remarks: ${data.ai_response}`;
+            } catch (error) {
+                aiRemarksResult.innerText = 'Error fetching AI remarks.';
+            } finally {
+                // Hide loading message
+                loadingMessage.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+pip install -U sentence-transformers
+
+groq Key:
+"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"
