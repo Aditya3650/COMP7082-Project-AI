@@ -1,1 +1,2 @@
 pip install -U sentence-transformers
+pip install groq
